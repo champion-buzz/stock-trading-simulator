@@ -1,0 +1,56 @@
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Market</h2>
+        <span class="text-muted small">Prices stream live · click a row to trade</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr><th>Symbol</th><th>Name</th><th class="text-end">Price</th><th class="text-end">Change</th><th class="text-end">Day range</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="q in vm.stream.list() track by q.symbol" ng-click="vm.select(q)"
+                ng-class="{'table-active': vm.selected === q.symbol}" class="clickable">
+              <td class="fw-semibold">{{ q.symbol }}</td>
+              <td class="text-muted small">{{ q.name }}</td>
+              <td class="text-end font-monospace" ng-class="{'flash-up': q.flash && q.dir === 'up', 'flash-down': q.flash && q.dir === 'down'}">
+                {{ q.price | currency }}</td>
+              <td class="text-end font-monospace" ng-class="q.change >= 0 ? 'text-success' : 'text-danger'">
+                {{ q.change | signed }} ({{ q.changePct | signed }}%)</td>
+              <td class="text-end small text-muted">{{ q.low | number:2 }} – {{ q.high | number:2 }}</td>
+              <td class="text-end"><a class="btn btn-sm btn-outline-secondary" ng-href="#!/stock/{{ q.symbol }}" ng-click="$event.stopPropagation()">Chart</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h5">Trade</h2>
+        <p class="small text-muted mb-3">Cash available: <strong>{{ vm.cash | currency }}</strong></p>
+        <div ng-if="!vm.selected" class="text-muted small">Select a stock from the table.</div>
+        <form ng-if="vm.selected" ng-submit="vm.ticket.submit(vm.selected, vm.refreshCash)">
+          <div class="d-flex justify-content-between align-items-baseline mb-3">
+            <span class="h4 mb-0">{{ vm.selected }}</span>
+            <span class="font-monospace">{{ vm.stream.quotes[vm.selected].price | currency }}</span>
+          </div>
+          <div class="btn-group w-100 mb-3" role="group">
+            <button type="button" class="btn" ng-class="vm.ticket.side === 'BUY' ? 'btn-success' : 'btn-outline-success'" ng-click="vm.ticket.side = 'BUY'">Buy</button>
+            <button type="button" class="btn" ng-class="vm.ticket.side === 'SELL' ? 'btn-danger' : 'btn-outline-danger'" ng-click="vm.ticket.side = 'SELL'">Sell</button>
+          </div>
+          <label class="form-label" for="qty">Shares</label>
+          <input id="qty" type="number" min="1" step="1" class="form-control mb-2" ng-model="vm.ticket.quantity">
+          <p class="small text-muted">Estimated total: {{ vm.ticket.quantity * vm.stream.quotes[vm.selected].price | currency }}</p>
+          <button class="btn btn-primary w-100" ng-disabled="vm.ticket.busy || !vm.ticket.quantity">Place {{ vm.ticket.side | lowercase }} order</button>
+          <div class="alert alert-success py-2 small mt-3 mb-0" ng-if="vm.ticket.message">{{ vm.ticket.message }}</div>
+          <div class="alert alert-danger py-2 small mt-3 mb-0" ng-if="vm.ticket.error">{{ vm.ticket.error }}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

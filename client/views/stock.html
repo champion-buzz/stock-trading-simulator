@@ -1,0 +1,62 @@
+<div ng-if="vm.notFound" class="alert alert-warning">Unknown symbol {{ vm.symbol }}.</div>
+<div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-2">
+  <div>
+    <a href="#!/" class="small">&larr; Market</a>
+    <h1 class="h3 mb-0">{{ vm.symbol }} <small class="text-muted fs-6">{{ vm.quote().name }}</small></h1>
+  </div>
+  <div class="text-end">
+    <div class="h3 mb-0 font-monospace">{{ vm.quote().price | currency }}</div>
+    <div class="font-monospace" ng-class="vm.quote().change >= 0 ? 'text-success' : 'text-danger'">
+      {{ vm.quote().change | signed }} ({{ vm.quote().changePct | signed }}%) today</div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Price history</span>
+        <div class="btn-group btn-group-sm">
+          <button ng-repeat="r in vm.ranges" class="btn" ng-class="vm.range === r ? 'btn-secondary' : 'btn-outline-secondary'" ng-click="vm.load(r)">{{ r }}</button>
+        </div>
+      </div>
+      <div class="card-body"><canvas id="historyChart" height="120"></canvas></div>
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Live (this session)</div>
+      <div class="card-body"><canvas id="liveChart" height="60"></canvas></div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h2 class="h6">Trade {{ vm.symbol }}</h2>
+        <p class="small text-muted mb-2">Cash {{ vm.cash | currency }} · You own {{ vm.position ? vm.position.quantity : 0 }} shares</p>
+        <form ng-submit="vm.ticket.submit(vm.symbol, vm.loadPosition)">
+          <div class="btn-group w-100 mb-2">
+            <button type="button" class="btn" ng-class="vm.ticket.side === 'BUY' ? 'btn-success' : 'btn-outline-success'" ng-click="vm.ticket.side = 'BUY'">Buy</button>
+            <button type="button" class="btn" ng-class="vm.ticket.side === 'SELL' ? 'btn-danger' : 'btn-outline-danger'" ng-click="vm.ticket.side = 'SELL'">Sell</button>
+          </div>
+          <input type="number" min="1" step="1" class="form-control mb-2" ng-model="vm.ticket.quantity" aria-label="Shares">
+          <button class="btn btn-primary w-100" ng-disabled="vm.ticket.busy || !vm.ticket.quantity">Place order</button>
+          <div class="alert alert-success py-2 small mt-2 mb-0" ng-if="vm.ticket.message">{{ vm.ticket.message }}</div>
+          <div class="alert alert-danger py-2 small mt-2 mb-0" ng-if="vm.ticket.error">{{ vm.ticket.error }}</div>
+        </form>
+      </div>
+    </div>
+    <div class="card shadow-sm" ng-if="vm.stats">
+      <div class="card-body">
+        <h2 class="h6">Analytics ({{ vm.range }})</h2>
+        <dl class="row small mb-0">
+          <dt class="col-7">Return</dt><dd class="col-5 text-end" ng-class="vm.stats.returnPct >= 0 ? 'text-success' : 'text-danger'">{{ vm.stats.returnPct | signed }}%</dd>
+          <dt class="col-7">Volatility (annualized)</dt><dd class="col-5 text-end">{{ vm.stats.annualizedVolatilityPct }}%</dd>
+          <dt class="col-7">Max drawdown</dt><dd class="col-5 text-end text-danger">{{ vm.stats.maxDrawdownPct }}%</dd>
+          <dt class="col-7">RSI (14)</dt><dd class="col-5 text-end">{{ vm.lastRsi }}</dd>
+          <dt class="col-7">Range high / low</dt><dd class="col-5 text-end">{{ vm.stats.high | number:2 }} / {{ vm.stats.low | number:2 }}</dd>
+          <dt class="col-7">Avg daily volume</dt><dd class="col-5 text-end">{{ vm.stats.avgVolume | number }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>

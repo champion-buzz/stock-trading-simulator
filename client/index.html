@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="stockSim" ng-csp>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock Trading Simulator</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/vendor/angular/angular-csp.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body ng-controller="ShellCtrl as shell">
+  <nav class="navbar navbar-expand navbar-dark bg-dark mb-4">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="#!/">📈 StockSim</a>
+      <ul class="navbar-nav me-auto" ng-if="shell.auth.isLoggedIn()">
+        <li class="nav-item"><a class="nav-link" href="#!/" ng-class="{active: shell.is('/')}">Market</a></li>
+        <li class="nav-item"><a class="nav-link" href="#!/portfolio" ng-class="{active: shell.is('/portfolio')}">Portfolio</a></li>
+        <li class="nav-item"><a class="nav-link" href="#!/transactions" ng-class="{active: shell.is('/transactions')}">Transactions</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-3 text-light" ng-if="shell.auth.isLoggedIn()">
+        <span class="small"><span class="live-dot" ng-class="{on: shell.stream.connected}"></span>
+          {{ shell.stream.connected ? 'Live' : 'Connecting…' }}</span>
+        <span class="small">{{ shell.auth.user.username }}</span>
+        <button class="btn btn-sm btn-outline-light" ng-click="shell.logout()">Log out</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container pb-5">
+    <div ng-view></div>
+  </main>
+
+  <script src="/vendor/angular/angular.min.js"></script>
+  <script src="/vendor/angular-route/angular-route.min.js"></script>
+  <script src="/vendor/chart.js/chart.umd.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/services.js"></script>
+  <script src="/js/controllers.js"></script>
+</body>
+</html>
