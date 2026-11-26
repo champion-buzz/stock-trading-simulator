@@ -4,7 +4,7 @@ const config = {
   port: parseInt(process.env.PORT || '8080', 10),
   // "mongo" (default) or "memory" (no database needed — handy for demos and tests)
   storage: process.env.STORAGE || 'mongo',
-  mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/stocksim',
+  mongoUri: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/stocksim',
   jwtSecret: process.env.JWT_SECRET || 'dev-only-secret-change-me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '12h',
   startingCash: parseFloat(process.env.STARTING_CASH || '100000'),
