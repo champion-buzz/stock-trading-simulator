@@ -164,7 +164,7 @@ class MongoStore {
           },
         },
       ],
-      { returnDocument: 'before', updatePipeline: true },
+      { returnDocument: 'before' },
     ).lean();
     if (!before) throw errors.insufficientShares();
     const avgCost = before.costBasis / before.quantity;
