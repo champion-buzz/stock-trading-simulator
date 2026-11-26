@@ -77,8 +77,14 @@ class MongoStore {
   }
 
   async init() {
-    await mongoose.connect(this.uri);
-    await Promise.all([User.init(), Position.init(), Transaction.init(), DailyBar.init()]);
+    if (mongoose.connection.readyState !== 1) await mongoose.connect(this.uri);
+    // createIndexes (not init, which is memoized) so indexes exist even after a DB drop
+    await Promise.all([User, Position, Transaction, DailyBar].map((m) => m.createIndexes()));
+  }
+
+  async dropAll() {
+    await mongoose.connection.db.dropDatabase();
+    await this.init();
   }
 
   async close() {

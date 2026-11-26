@@ -17,22 +17,20 @@ describe.each(backends)('API with %s store', (name, makeStore) => {
   let market;
   let token;
 
+  jest.setTimeout(30000);
+
   beforeAll(async () => {
     store = makeStore();
     await store.init();
-    if (name === 'mongo') {
-      const mongoose = require('mongoose');
-      await mongoose.connection.db.dropDatabase();
-      await store.init();
-    }
+    if (name === 'mongo') await store.dropAll(); // clean slate, indexes recreated
     market = new MarketSimulator(config.symbols, { tickIntervalMs: 1000 });
     await seedHistory(store, market);
     app = createApp({ store, market, logRequests: false });
   });
 
   afterAll(async () => {
-    market.stop();
-    await store.close();
+    market?.stop();
+    await store?.close();
   });
 
   const auth = () => ({ Authorization: `Bearer ${token}` });
